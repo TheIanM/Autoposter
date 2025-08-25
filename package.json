@@ -1,0 +1,8 @@
+{
+  "name": "wordpress-bluesky-autoposter",
+  "version": "1.0.0",
+  "dependencies": {
+    "rss-parser": "^3.13.0",
+    "@atproto/api": "^0.12.0"
+  }
+}

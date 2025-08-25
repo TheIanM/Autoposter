@@ -1,0 +1,52 @@
+# .github/workflows/wordpress-to-bluesky.yml
+name: WordPress to Bluesky Auto-Post
+
+on:
+  schedule:
+    # Run every 15 minutes (adjust as needed)
+    - cron: '*/15 * * * *'
+  workflow_dispatch: # Allows manual trigger
+
+jobs:
+  check-and-post:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Install dependencies
+      run: |
+        cat > package.json << 'EOF'
+        {
+          "name": "wordpress-bluesky-autoposter",
+          "version": "1.0.0",
+          "dependencies": {
+            "rss-parser": "^3.13.0",
+            "@atproto/api": "^0.12.0"
+          }
+        }
+        EOF
+        npm install
+        
+    - name: Run auto-poster script
+      run: node autoposter.js
+      env:
+        WORDPRESS_RSS_URL: ${{ secrets.WORDPRESS_RSS_URL }}
+        BLUESKY_HANDLE: ${{ secrets.BLUESKY_HANDLE }}
+        BLUESKY_APP_PASSWORD: ${{ secrets.BLUESKY_APP_PASSWORD }}
+        
+    - name: Commit and push if changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add -A
+        if ! git diff --staged --quiet; then
+          git commit -m "Update posted items list [skip ci]"
+          git push
+        fi

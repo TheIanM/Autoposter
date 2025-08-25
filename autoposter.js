@@ -47,19 +47,18 @@ function createBlueskyPost(item) {
     .replace(/\s+/g, ' ') // Normalize whitespace
     .trim();
   
-  // Create post text
+  // Simpler format - just title and link, let Bluesky handle the preview
   let postText = `📝 New blog post: ${title}`;
   
-  // Add description if there's room
-  const remainingLength = 280 - postText.length - link.length - 3; // 3 for spacing
-  if (remainingLength > 50 && cleanDescription) {
-    const shortDescription = truncateText(cleanDescription, remainingLength);
-    postText += `\n\n${shortDescription}`;
+  // Add a short description if available and not too long
+  if (cleanDescription && cleanDescription.length < 150) {
+    postText += `\n\n${cleanDescription}`;
   }
   
+  // Add link on its own line for better link card detection
   postText += `\n\n${link}`;
   
-  return truncateText(postText, 280);
+  return postText;
 }
 
 async function main() {

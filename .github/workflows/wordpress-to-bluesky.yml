@@ -10,7 +10,7 @@ on:
 jobs:
   check-and-post:
     runs-on: ubuntu-latest
-     permissions:
+    permissions:
       contents: write
     
     steps:
